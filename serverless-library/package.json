@@ -1,0 +1,18 @@
+{
+  "name": "serverless-library",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Slobodan Stojanović <slobodan@cloudhorizon.com> (http://slobodan.me)",
+  "license": "MIT",
+  "devDependencies": {
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
+  }
+}
