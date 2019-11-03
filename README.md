@@ -8,10 +8,10 @@ We based our TypeScript at [Vacation Tracker](https://vacationtracker.io?utm_sou
 
 To start with the project, let's create a new folder and name it `serverless-library`. Then open your terminal and navigate to the folder we just created.
 
-The next step is to initiate a new node project by running the `npm init -y` command, and install the dependencies. Beside TypeScript, we'll use Webpack and Webpack CLI for building the project and TSLint to check our syntax. All of these are dev dependencies. Let's run the following command to install the dependencies:
+The next step is to initiate a new node project by running the `npm init -y` command, and install the dependencies. Beside TypeScript, we'll use Webpack and Webpack CLI for building the project, TypeScript loader for Webpack, and TSLint to check our syntax. All of these are dev dependencies. Let's run the following command to install the dependencies:
 
 ```bash
-npm install typescript tslint webpack webpack-cli --save-dev
+npm install typescript tslint webpack webpack-cli ts-loader --save-dev
 ```
 
 Now that we have the dependencies let's create a TypeScript config file in the project root and name it `tsconfig.json`. This file specifies the root files and the compiler options required to compile the project.
@@ -165,7 +165,157 @@ Now that we have the project setup, we'll need the first function to be able to 
 
 ## Writing a Lambda function
 
-...
+An API Gateway event will trigger our first Lambda function. To add types, we'll need to install the `aws-lambda` module and its types, `@types/aws-lambda`, from the npm.  We'll also need type definitions for node.js. To install required dependencies, navigate to the project folder in your terminal, and run the following command:
+
+```bash
+npm i aws-lambda @types/aws-lambda @types/node --save
+```
+
+After we installed the dependencies, we can create our first function. Create the `src` folder in your project root, and `list-books` folder inside it. Finally, create an empty `lambda.ts` file in the `src/list-books` folder.
+
+Our `lambda.ts` file represents a Lambda function. It should export a function called `handler` that accepts an API Gateway proxy event and returns a simple API response in a format required by the Amazon API Gateway.
+
+At the top of the `lambda.ts` file, we should import `APIGatewayProxyEvent` from `aws-lambda` module that we installed. We can do that by adding the following line:
+
+```typescript
+import { APIGatewayProxyEvent } from 'aws-lambda'
+```
+
+Then, we can create our handler function that returns an HTTP status 200 with 'OK' text. To do so, we'll add the following function to our `lambda.ts` file:
+
+```typescript
+export function handler(event: APIGatewayProxyEvent) {
+  console.log('EVENT', JSON.stringify(event))
+  return {
+    statusCode: 200,
+    body: 'OK',
+    headers: {
+      'Content-Type': 'text/plain'
+    },
+    isBase64Encoded: false
+  }
+}
+```
+
+At the top of our handler function, we stringify the event, because it's an object, and log it. This log helps us to test our function locally, but we'll talk about that a bit later.
+
+To return a valid response to the Amazon API Gateway, we return an object containing status code, body, headers, and tell API Gateway if the response is base64 encoded.
+
+As you can see, generating an API Gateway response is the most significant part of our function, and we'll need to do something similar with all the functions we create. However, we want to focus on more exciting things, so we'll install use a small library, called API Gateway HTTP response, to generate these API Gateway responses. To do so, run the following command from your terminal:
+
+```bash
+npm i @vacationtracker/api-gateway-http-response --save
+```
+
+Then, we'll import the library at the top of our `lambda.ts` file by adding the following line:
+
+```typescript
+import httpResponse from '@vacationtracker/api-gateway-http-response'
+```
+
+And we'll replace an object we are returning with the following line:
+
+```typescript
+return httpResponse('OK')
+```
+
+That makes our code more readable. And the last thing we want to do is to return a static list of the books. For example, we can use the following array of serverless books:
+
+```json
+[
+    {
+      "isbn": "978-1617294723",
+      "name": "Serverless Applications with Node.js: Using AWS Lambda and Claudia.js",
+      "link": "https://www.amazon.com/Serverless-Applications-Node-js-Lambda-Claudia-js/dp/1617294721",
+      "authors": [
+        "Aleksandar Simović",
+        "Slobodan Stojanović"
+      ],
+      "publishDate": "2019-02-18",
+      "publisher": "Manning Publications"
+    },
+    {
+      "isbn": "978-0993088155",
+      "name": "Running Serverless: Introduction to AWS Lambda and the Serverless Application Model",
+      "link": "https://www.amazon.com/Running-Serverless-Introduction-Lambda-Application/dp/0993088155",
+      "authors": [
+        "Gojko Adzic"
+      ],
+      "publishDate": "2019-07-01",
+      "publisher": "Neuri Consulting Llp"
+    }
+  ]
+```
+
+To make things simple, we can add this list directly in the code. Create the `books` array with this array of books, then return it by changing `return httpResponse('OK')` to `return httpResponse(books)`.
+
+At the end, our `lambda.ts` file should look similar to the following code snippet:
+
+```typescript
+import httpResponse from '@vacationtracker/api-gateway-http-response'
+import { APIGatewayProxyEvent } from 'aws-lambda'
+
+export function handler(event: APIGatewayProxyEvent) {
+  console.log('EVENT', JSON.stringify(event))
+  const books = [
+    {
+      isbn: '978-1617294723',
+      name: 'Serverless Applications with Node.js: Using AWS Lambda and Claudia.js',
+      link: 'https://www.amazon.com/Serverless-Applications-Node-js-Lambda-Claudia-js/dp/1617294721',
+      authors: [
+        'Aleksandar Simović',
+        'Slobodan Stojanović',
+      ],
+      publishDate: '2019-02-18',
+      publisher: 'Manning Publications',
+    },
+    {
+      isbn: '978-0993088155',
+      name: 'Running Serverless: Introduction to AWS Lambda and the Serverless Application Model',
+      link: 'https://www.amazon.com/Running-Serverless-Introduction-Lambda-Application/dp/0993088155',
+      authors: [
+        'Gojko Adzic',
+      ],
+      publishDate: '2019-07-01',
+      publisher: 'Neuri Consulting Llp',
+    },
+  ]
+  return httpResponse(books)
+}
+```
+
+To build the project in production mode, add the following line to the scripts section of our `package.json` file:
+
+```json
+"build": "NODE_ENV=prod webpack --mode=production --progress"
+```
+
+This command builds our TypeScript files and shows the progress in percentage in the terminal.
+
+We can also add another line that watches for file changes and build the project in the development mode. That's useful during development, especially in combination with running a function locally. To do so, add the following line to the scripts section of our `package.json` file:
+
+```json
+"watch": "NODE_ENV=dev webpack --watch --mode=development"
+```
+
+To confirm that everything worked, run the `npm run build` from the project folder in the terminal. This command should output something similar to the following:
+
+```bash
+Hash: 1ed67eacf832d1627963
+Version: webpack 4.41.2
+Time: 1271ms
+Built at: 2019-11-03 17:56:54
+                   Asset      Size  Chunks                   Chunk Names
+    list-books/lambda.js  5.79 KiB       0  [emitted]        list-books
+list-books/lambda.js.map   6.2 KiB       0  [emitted] [dev]  list-books
+Entrypoint list-books = list-books/lambda.js list-books/lambda.js.map
+[0] ./src/list-books/lambda.ts 1.36 KiB {0} [built]
+    + 1 hidden module
+```
+
+And you should see the `build` folder with the `list-books` folder inside it. The `list-books` folder should contain `lambda.js` and `lambda.js.map` files.
+
+But to test if our Lambda function works as it should, we need to deploy it.
 
 ## Deploy AWS Lambda and Amazon API Gateway using AWS CDK
 

@@ -4,15 +4,24 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "NODE_ENV=prod webpack --mode=production --progress",
+    "watch": "NODE_ENV=dev webpack --watch --mode=development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "Slobodan Stojanović <slobodan@cloudhorizon.com> (http://slobodan.me)",
   "license": "MIT",
   "devDependencies": {
+    "ts-loader": "^6.2.1",
     "tslint": "^5.20.0",
     "typescript": "^3.6.4",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10"
+  },
+  "dependencies": {
+    "@types/aws-lambda": "^8.10.34",
+    "@types/node": "^12.12.5",
+    "@vacationtracker/api-gateway-http-response": "^1.1.1",
+    "aws-lambda": "^0.1.2"
   }
 }
