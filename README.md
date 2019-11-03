@@ -319,6 +319,20 @@ But to test if our Lambda function works as it should, we need to deploy it.
 
 ## Deploy AWS Lambda and Amazon API Gateway using AWS CDK
 
+There are many ways to deploy a Lambda function.
+
+You can create a zip archive of your code and upload it directly to the [AWS Web Console](http://console.aws.amazon.com/), as we all did in the early days of serverless. But then you need to set permissions and an API Gateway trigger manually. Using the AWS Web Console feels like a cave art compared to the new state-of-the-art tools.
+
+You can, of course, automate your deployment using AWS CLI or AWS API. However, it's much better if you use one of the popular deployment frameworks and libraries as they automated and tested that process a long time ago. There are many great deployment frameworks and libraries today, such as [Serverless Framework](https://serverless.com), [Claudia.js](https://claudiajs.com), and [Architect](https://arc.codes).
+
+AWS step up their deployment game at some point. In most cases, [AWS CloudFormation](https://aws.amazon.com/cloudformation/) has everything you need to deploy a modern serverless application. But, soon after adding a few dozen of resources, your CloudFormation template starts looking as beautiful as an average [Brutalist_architecture](https://en.wikipedia.org/wiki/Brutalist_architecture).
+
+Fortunately, you can use various tools built on top of AWS CloudFormation, such as the [AWS Serverless Application Model (AWS SAM)](https://aws.amazon.com/serverless/sam/), an open-source framework for building serverless applications. AWS SAM makes your CloudFormation YAML more human-friendly, and its CLI tool brings excellent tooling around it, including SAM local, for local testing, but it has its quirks.
+
+But as we are using TypeScript, probably the most exciting tool is a new kid in town - the [AWS Cloud Development Kit (AWS CDK)](https://aws.amazon.com/cdk/).
+
+### The AWS Cloud Development Kit (AWS CDK)
+
 ...
 
 ### CDK setup
