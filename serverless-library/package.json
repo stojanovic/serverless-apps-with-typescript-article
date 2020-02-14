@@ -22,6 +22,6 @@
     "@types/aws-lambda": "^8.10.34",
     "@types/node": "^12.12.5",
     "@vacationtracker/api-gateway-http-response": "^1.1.1",
-    "aws-lambda": "^0.1.2"
+    "aws-lambda": "^1.0.5"
   }
 }
